@@ -967,33 +967,22 @@ function renderCompetition() {
 
           <div class="score-actions">
 
-           <button
-  class="score-btn minus"
-  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, -10)"
->
-  −10
-</button>
+           function adjustScoreByIndex(index, amount) {
+  if (index < 0 || index >= data.members.length) {
+    return;
+  }
 
-<button
-  class="score-btn minus"
-  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, -5)"
->
-  −5
-</button>
+  const name = data.members[index];
+  const scores = getScores(competitionMonth);
 
-<button
-  class="score-btn plus"
-  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, 5)"
->
-  +5
-</button>
+  scores[name] = Math.max(
+    0,
+    (scores[name] || 0) + amount
+  );
 
-<button
-  class="score-btn plus"
-  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, 10)"
->
-  +10
-</button>
+  save();
+  renderCompetition();
+}
 
           </div>
 
