@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lớn Lên Trong Chúa Thánh Thần 1 - Điểm danh</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#eafaf3,#eaf3ff);color:#173b35}
+header{background:linear-gradient(135deg,#168a70,#2d91c7);color:#fff;padding:28px 18px;text-align:center}
+h1{margin:0 0 8px;font-size:28px}.quote{opacity:.95}
+main{max-width:1000px;margin:24px auto;padding:0 16px}.tabs{display:flex;gap:10px;margin-bottom:16px}.tabs button{border:0;padding:12px 18px;border-radius:12px;background:#fff;cursor:pointer;font-weight:700}.tabs .active{background:#168a70;color:#fff}
+.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 6px 20px #00000012}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 14px;background:#168a70;color:#fff;cursor:pointer;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{text-align:center;padding:16px;background:#f3faf7;border-radius:14px}.stat b{display:block;font-size:26px}
+input{width:100%;padding:12px;border:1px solid #ccdcd7;border-radius:10px;font-size:16px;margin:12px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid #eee;gap:12px}.row:last-child{border:0}
+.badge{border:0;border-radius:10px;padding:9px 12px;cursor:pointer}.present{background:#d9f6e9;color:#08714e}.absent{background:#ffe1e1;color:#a62a2a}
+.session{padding:15px;border:1px solid #dcebe6;border-radius:14px;margin:10px 0}.bar{height:10px;background:#e8eeee;border-radius:20px;overflow:hidden}.fill{height:100%;background:#168a70}
+@media(max-width:600px){.stats{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header><h1>✝ LỚN LÊN TRONG CHÚA THÁNH THẦN 1</h1><div class="quote">“Xin Chúa Thánh Thần hướng dẫn chúng con”</div></header>
+<main>
+<div class="tabs"><button class="active" data-tab="attendance">📝 Điểm danh</button><button data-tab="sessions">📊 Thống kê buổi học</button></div>
+<section id="attendance">
+<div class="card top"><div><b id="sessionTitle"></b><div id="sessionDate"></div></div><button class="btn" onclick="newSession()">＋ Buổi học mới</button></div>
+<div class="card stats"><div class="stat">Tổng số<b id="total">0</b></div><div class="stat">Có mặt<b id="present">0</b></div><div class="stat">Vắng<b id="absent">0</b></div></div>
+<div class="card"><input id="search" placeholder="🔎 Tìm tên..." oninput="render()"><div id="list"></div></div>
+</section>
+<section id="sessions" style="display:none"><div class="card"><h2>📊 Thống kê</h2><div class="stats"><div class="stat">Số buổi<b id="sessionCount">0</b></div><div class="stat">Số thành viên<b id="memberCount">0</b></div><div class="stat">Tỷ lệ đi học<b id="average">0%</b></div></div></div><div class="card"><h2>📅 Các buổi học</h2><div id="sessionList"></div></div></section>
+</main>
+<script src="script.js"></script>
+</body></html>
