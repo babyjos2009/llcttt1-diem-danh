@@ -21,42 +21,27 @@ if (!data || !Array.isArray(data.members)) {
     current: -1,
     competition: {}
   };
-
   save();
 }
 
-if (!Array.isArray(data.sessions)) {
-  data.sessions = [];
-}
-
-if (typeof data.current !== "number") {
-  data.current = -1;
-}
-
+if (!Array.isArray(data.sessions)) data.sessions = [];
+if (typeof data.current !== "number") data.current = -1;
 if (!data.competition || typeof data.competition !== "object") {
   data.competition = {};
 }
 
-let now = new Date();
+let today = new Date();
 
 let competitionMonth =
-  now.getFullYear() +
+  today.getFullYear() +
   "-" +
-  String(now.getMonth() + 1).padStart(2, "0");
+  String(today.getMonth() + 1).padStart(2, "0");
 
-
-/* =========================
-   LƯU DỮ LIỆU
-========================= */
 
 function save() {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-
-/* =========================
-   CHỐNG HTML LỖI
-========================= */
 
 function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, function (m) {
@@ -71,16 +56,8 @@ function escapeHtml(text) {
 }
 
 
-/* =========================
-   BUỔI HỌC HIỆN TẠI
-========================= */
-
 function getCurrentSession() {
-
-  if (
-    data.current < 0 ||
-    !data.sessions[data.current]
-  ) {
+  if (data.current < 0 || !data.sessions[data.current]) {
     return null;
   }
 
@@ -89,7 +66,7 @@ function getCurrentSession() {
 
 
 /* =========================
-   HIỂN THỊ CHÍNH
+   HIỂN THỊ
 ========================= */
 
 function render() {
@@ -105,8 +82,6 @@ function render() {
   }
 
 
-  /* CHƯA CÓ BUỔI HỌC */
-
   if (!s) {
 
     document.getElementById("sessionTitle").textContent =
@@ -116,26 +91,16 @@ function render() {
       "Hãy bấm “＋ Tạo buổi học” để bắt đầu.";
 
     document.getElementById("list").innerHTML = `
-
       <div style="text-align:center;padding:25px 10px">
-
         <div style="font-size:42px">📅</div>
-
         <h3>Chưa có buổi học nào</h3>
-
         <p class="small">
           Website sẽ không tự tạo buổi học.
         </p>
-
-        <button
-          class="btn"
-          onclick="createSession()"
-        >
+        <button class="btn" onclick="createSession()">
           ＋ Tạo buổi học
         </button>
-
       </div>
-
     `;
 
     document.getElementById("total").textContent =
@@ -154,8 +119,6 @@ function render() {
   }
 
 
-  /* CÓ BUỔI HỌC */
-
   document.getElementById("sessionTitle").textContent =
     s.label;
 
@@ -163,13 +126,9 @@ function render() {
     new Date(s.date).toLocaleDateString("vi-VN");
 
 
-  const searchInput =
-    document.getElementById("search");
-
   const q =
-    searchInput ?
-    searchInput.value.toLowerCase() :
-    "";
+    (document.getElementById("search")?.value || "")
+      .toLowerCase();
 
 
   const shown = data.members
@@ -177,47 +136,39 @@ function render() {
       name: name,
       index: index
     }))
-    .filter(function (item) {
-      return item.name.toLowerCase().includes(q);
-    });
+    .filter(item =>
+      item.name.toLowerCase().includes(q)
+    );
 
 
   document.getElementById("list").innerHTML =
     shown.length
 
-      ? shown.map(function (item) {
+      ? shown.map(item => `
+          <div class="row">
 
-          return `
+            <span class="member-name">
+              ${item.index + 1}.
+              ${escapeHtml(item.name)}
+            </span>
 
-            <div class="row">
+            <button
+              class="badge ${
+                s.attendance[item.index]
+                  ? "present"
+                  : "absent"
+              }"
+              onclick="toggle(${item.index})"
+            >
+              ${
+                s.attendance[item.index]
+                  ? "✓ Có mặt"
+                  : "✕ Vắng"
+              }
+            </button>
 
-              <span class="member-name">
-                ${item.index + 1}.
-                ${escapeHtml(item.name)}
-              </span>
-
-              <button
-                class="badge ${
-                  s.attendance[item.index]
-                    ? "present"
-                    : "absent"
-                }"
-                onclick="toggle(${item.index})"
-              >
-
-                ${
-                  s.attendance[item.index]
-                    ? "✓ Có mặt"
-                    : "✕ Vắng"
-                }
-
-              </button>
-
-            </div>
-
-          `;
-
-        }).join("")
+          </div>
+        `).join("")
 
       : "<p>Không tìm thấy thành viên.</p>";
 
@@ -253,9 +204,7 @@ function createSession() {
     `Buổi học ${data.sessions.length + 1}`
   );
 
-  if (label === null) {
-    return;
-  }
+  if (label === null) return;
 
   const cleanLabel = label.trim();
 
@@ -265,18 +214,12 @@ function createSession() {
   }
 
 
-  const today =
-    new Date().toLocaleDateString("vi-VN");
-
-
   const dateInput = prompt(
     "Nhập ngày học theo dạng DD/MM/YYYY:",
-    today
+    new Date().toLocaleDateString("vi-VN")
   );
 
-  if (dateInput === null) {
-    return;
-  }
+  if (dateInput === null) return;
 
 
   const parts =
@@ -284,11 +227,7 @@ function createSession() {
 
 
   if (parts.length !== 3) {
-
-    alert(
-      "Vui lòng nhập ngày theo dạng DD/MM/YYYY."
-    );
-
+    alert("Vui lòng nhập ngày theo dạng DD/MM/YYYY.");
     return;
   }
 
@@ -297,9 +236,7 @@ function createSession() {
   const m = parseInt(parts[1], 10);
   const y = parseInt(parts[2], 10);
 
-
-  const date =
-    new Date(y, m - 1, d);
+  const date = new Date(y, m - 1, d);
 
 
   if (
@@ -308,22 +245,16 @@ function createSession() {
     date.getMonth() !== m - 1 ||
     date.getFullYear() !== y
   ) {
-
     alert("Ngày học không hợp lệ.");
-
     return;
   }
 
 
   data.sessions.push({
-
     date: date.toISOString(),
-
     label: cleanLabel,
-
     attendance:
       Array(data.members.length).fill(false)
-
   });
 
 
@@ -332,7 +263,6 @@ function createSession() {
 
 
   save();
-
   render();
 }
 
@@ -346,11 +276,7 @@ function toggle(index) {
   const s = getCurrentSession();
 
   if (!s) {
-
-    alert(
-      "Bạn hãy tạo buổi học trước."
-    );
-
+    alert("Bạn hãy tạo buổi học trước.");
     return;
   }
 
@@ -360,13 +286,12 @@ function toggle(index) {
 
 
   save();
-
   render();
 }
 
 
 /* =========================
-   THỐNG KÊ BUỔI HỌC
+   THỐNG KÊ
 ========================= */
 
 function renderSessions() {
@@ -374,10 +299,7 @@ function renderSessions() {
   const box =
     document.getElementById("sessionList");
 
-
-  if (!box) {
-    return;
-  }
+  if (!box) return;
 
 
   if (!data.sessions.length) {
@@ -392,7 +314,7 @@ function renderSessions() {
 
 
     box.innerHTML =
-      data.sessions.map(function (s, i) {
+      data.sessions.map((s, i) => {
 
         const present =
           s.attendance.filter(Boolean).length;
@@ -413,12 +335,9 @@ function renderSessions() {
 
 
         return `
-
           <div class="session">
 
-            <b>
-              ${escapeHtml(s.label)}
-            </b>
+            <b>${escapeHtml(s.label)}</b>
 
             <div>
               ${new Date(s.date)
@@ -431,14 +350,11 @@ function renderSessions() {
             </div>
 
             <div class="bar">
-
               <div
                 class="fill"
                 style="width:${pct}%"
               ></div>
-
             </div>
-
 
             <div
               class="actions"
@@ -462,7 +378,6 @@ function renderSessions() {
             </div>
 
           </div>
-
         `;
 
       }).join("");
@@ -487,15 +402,13 @@ function renderSessions() {
 
 
   if (!data.sessions.length) {
-
-    document.getElementById("average").textContent =
-      "0%";
+    document.getElementById("average").textContent = "0%";
   }
 }
 
 
 /* =========================
-   MỞ BUỔI HỌC
+   MỞ BUỔI
 ========================= */
 
 function selectSession(index) {
@@ -509,7 +422,7 @@ function selectSession(index) {
 
 
 /* =========================
-   XÓA BUỔI HỌC
+   XÓA BUỔI
 ========================= */
 
 function deleteSession(index) {
@@ -517,23 +430,16 @@ function deleteSession(index) {
   const session =
     data.sessions[index];
 
-
-  if (!session) {
-    return;
-  }
+  if (!session) return;
 
 
   const ok = confirm(
-
     `Bạn có chắc muốn xóa "${session.label}" không?\n\n` +
     `Dữ liệu điểm danh của buổi này cũng sẽ bị xóa.`
-
   );
 
 
-  if (!ok) {
-    return;
-  }
+  if (!ok) return;
 
 
   data.sessions.splice(index, 1);
@@ -558,7 +464,6 @@ function deleteSession(index) {
 
 
   save();
-
   render();
 }
 
@@ -571,7 +476,7 @@ function showTab(tab) {
 
   document
     .querySelectorAll(".tabs button")
-    .forEach(function (button) {
+    .forEach(button => {
 
       button.classList.toggle(
         "active",
@@ -586,12 +491,10 @@ function showTab(tab) {
     "sessions",
     "members",
     "competition"
-  ].forEach(function (id) {
+  ].forEach(id => {
 
     document.getElementById(id).style.display =
-      id === tab
-        ? "block"
-        : "none";
+      id === tab ? "block" : "none";
 
   });
 
@@ -602,9 +505,9 @@ function showTab(tab) {
 
 document
   .querySelectorAll(".tabs button")
-  .forEach(function (button) {
+  .forEach(button => {
 
-    button.onclick = function () {
+    button.onclick = () => {
       showTab(button.dataset.tab);
     };
 
@@ -612,7 +515,7 @@ document
 
 
 /* =========================
-   QUẢN LÝ THÀNH VIÊN
+   THÀNH VIÊN
 ========================= */
 
 function renderMembers() {
@@ -620,95 +523,66 @@ function renderMembers() {
   const box =
     document.getElementById("memberList");
 
-
-  if (!box) {
-    return;
-  }
+  if (!box) return;
 
 
   box.innerHTML =
     data.members.length
 
-      ? data.members.map(function (name, index) {
+      ? data.members.map((name, index) => `
+          <div class="row">
 
-          return `
+            <span class="member-name">
+              ${index + 1}.
+              ${escapeHtml(name)}
+            </span>
 
-            <div class="row">
+            <div class="actions">
 
-              <span class="member-name">
+              <button
+                class="btn gray"
+                onclick="renameMember(${index})"
+              >
+                ✏️ Đổi tên
+              </button>
 
-                ${index + 1}.
-                ${escapeHtml(name)}
-
-              </span>
-
-
-              <div class="actions">
-
-                <button
-                  class="btn gray"
-                  onclick="renameMember(${index})"
-                >
-                  ✏️ Đổi tên
-                </button>
-
-
-                <button
-                  class="btn red"
-                  onclick="deleteMember(${index})"
-                >
-                  🗑️ Xóa
-                </button>
-
-              </div>
+              <button
+                class="btn red"
+                onclick="deleteMember(${index})"
+              >
+                🗑️ Xóa
+              </button>
 
             </div>
 
-          `;
-
-        }).join("")
+          </div>
+        `).join("")
 
       : "<p>Chưa có thành viên.</p>";
 }
 
-
-/* =========================
-   THÊM THÀNH VIÊN
-========================= */
 
 function addMember() {
 
   const input =
     document.getElementById("newMember");
 
-
   const name =
     input.value.trim();
 
 
   if (!name) {
-
-    alert(
-      "Bạn chưa nhập tên."
-    );
-
+    alert("Bạn chưa nhập tên.");
     return;
   }
 
 
   if (
-    data.members.some(function (n) {
-
-      return n.toLowerCase() ===
-        name.toLowerCase();
-
-    })
+    data.members.some(
+      n => n.toLowerCase() === name.toLowerCase()
+    )
   ) {
-
-    alert(
-      "Tên này đã có trong danh sách."
-    );
-
+    alert("Tên này đã có trong danh sách.");
     return;
   }
 
@@ -716,24 +590,17 @@ function addMember() {
   data.members.push(name);
 
 
-  data.sessions.forEach(function (session) {
-
+  data.sessions.forEach(session => {
     session.attendance.push(false);
-
   });
 
 
   input.value = "";
 
   save();
-
   render();
 }
 
-
-/* =========================
-   ĐỔI TÊN
-========================= */
 
 function renameMember(index) {
 
@@ -748,9 +615,7 @@ function renameMember(index) {
     );
 
 
-  if (name === null) {
-    return;
-  }
+  if (name === null) return;
 
 
   const clean =
@@ -758,48 +623,29 @@ function renameMember(index) {
 
 
   if (!clean) {
-
-    alert(
-      "Tên không được để trống."
-    );
-
+    alert("Tên không được để trống.");
     return;
   }
 
 
   if (
-    data.members.some(function (n, i) {
-
-      return (
+    data.members.some(
+      (n, i) =>
         i !== index &&
-        n.toLowerCase() ===
-        clean.toLowerCase()
-      );
-
-    })
+        n.toLowerCase() === clean.toLowerCase()
+    )
   ) {
-
-    alert(
-      "Tên này đã có trong danh sách."
-    );
-
+    alert("Tên này đã có trong danh sách.");
     return;
   }
 
 
-  data.members[index] =
-    clean;
-
+  data.members[index] = clean;
 
   save();
-
   render();
 }
 
-
-/* =========================
-   XÓA THÀNH VIÊN
-========================= */
 
 function deleteMember(index) {
 
@@ -809,84 +655,48 @@ function deleteMember(index) {
     );
 
 
-  if (!ok) {
-    return;
-  }
+  if (!ok) return;
 
 
   data.members.splice(index, 1);
 
 
-  data.sessions.forEach(function (session) {
-
+  data.sessions.forEach(session => {
     session.attendance.splice(index, 1);
-
   });
 
 
   save();
-
   render();
 }
 
 
-/* ==================================
-   THANH THI ĐUA THEO THÁNG
-================================== */
-
-
-/* Lấy tháng từ ngày */
-
-function monthKeyFromDate(date) {
-
-  const d =
-    new Date(date);
-
-
-  return (
-    d.getFullYear() +
-    "-" +
-    String(d.getMonth() + 1).padStart(2, "0")
-  );
-}
-
-
-/* Hiển thị tháng */
+/* =================================
+   🏆 THANH THI ĐUA
+================================= */
 
 function formatCompetitionMonth(key) {
 
-  const parts =
+  const [year, month] =
     key.split("-").map(Number);
-
-
-  const year = parts[0];
-  const month = parts[1];
-
 
   return `THÁNG ${month}/${year}`;
 }
 
 
-/* Lấy điểm tháng */
-
 function getScores(key) {
 
   if (!data.competition[key]) {
-
     data.competition[key] = {};
-
   }
 
 
-  data.members.forEach(function (name) {
+  data.members.forEach(name => {
 
     if (
-      typeof data.competition[key][name]
-      !== "number"
+      typeof data.competition[key][name] !== "number"
     ) {
-
       data.competition[key][name] = 0;
-
     }
 
   });
@@ -896,21 +706,17 @@ function getScores(key) {
 }
 
 
-/* Tháng trước / tháng sau */
+/* THÁNG TRƯỚC / THÁNG SAU */
 
 function changeCompetitionMonth(delta) {
 
-  const parts =
+  const [year, month] =
     competitionMonth
       .split("-")
       .map(Number);
 
 
-  const year = parts[0];
-  const month = parts[1];
-
-
-  const d =
+  const date =
     new Date(
       year,
       month - 1 + delta,
@@ -919,10 +725,10 @@ function changeCompetitionMonth(delta) {
 
 
   competitionMonth =
-    d.getFullYear() +
+    date.getFullYear() +
     "-" +
     String(
-      d.getMonth() + 1
+      date.getMonth() + 1
     ).padStart(2, "0");
 
 
@@ -930,7 +736,7 @@ function changeCompetitionMonth(delta) {
 }
 
 
-/* Cộng / trừ điểm */
+/* CỘNG / TRỪ ĐIỂM */
 
 function adjustScore(name, amount) {
 
@@ -951,29 +757,27 @@ function adjustScore(name, amount) {
 }
 
 
-/* Reset điểm tháng */
+/* ĐẶT LẠI */
 
 function resetCompetitionMonth() {
 
   const ok =
     confirm(
-      `Đặt lại toàn bộ điểm của ${formatCompetitionMonth(competitionMonth)} về 0?`
+      `Đặt lại toàn bộ điểm của ${formatCompetitionMonth(
+        competitionMonth
+      )} về 0?`
     );
 
 
-  if (!ok) {
-    return;
-  }
+  if (!ok) return;
 
 
   const scores =
     getScores(competitionMonth);
 
 
-  data.members.forEach(function (name) {
-
+  data.members.forEach(name => {
     scores[name] = 0;
-
   });
 
 
@@ -983,21 +787,16 @@ function resetCompetitionMonth() {
 }
 
 
-/* Giải */
+/* GIẢI */
 
 function getPrize(rank, total) {
 
-  if (rank === 1) {
-    return "🏆 Giải Nhất";
-  }
+  if (rank === 1) return "🏆 Giải Nhất";
 
-  if (rank === 2) {
-    return "🥈 Giải Nhì";
-  }
+  if (rank === 2) return "🥈 Giải Nhì";
 
-  if (rank === 3) {
-    return "🥉 Giải Ba";
-  }
+  if (rank === 3) return "🥉 Giải Ba";
+
 
   if (
     total >= 4 &&
@@ -1006,7 +805,6 @@ function getPrize(rank, total) {
       Math.ceil(total / 3)
     )
   ) {
-
     return "🏅 Khuyến khích";
   }
 
@@ -1015,9 +813,7 @@ function getPrize(rank, total) {
 }
 
 
-/* =========================
-   HIỂN THỊ THANH THI ĐUA
-========================= */
+/* HIỂN THỊ THANH THI ĐUA */
 
 function renderCompetition() {
 
@@ -1026,16 +822,13 @@ function renderCompetition() {
       "competitionMonth"
     );
 
-
   const box =
     document.getElementById(
       "competitionList"
     );
 
 
-  if (!title || !box) {
-    return;
-  }
+  if (!title || !box) return;
 
 
   title.textContent =
@@ -1052,15 +845,11 @@ function renderCompetition() {
 
   const ranked =
     data.members
-      .map(function (name) {
-
-        return {
-          name: name,
-          score: scores[name] || 0
-        };
-
-      })
-      .sort(function (a, b) {
+      .map(name => ({
+        name: name,
+        score: scores[name] || 0
+      }))
+      .sort((a, b) => {
 
         return (
           b.score - a.score ||
@@ -1077,9 +866,7 @@ function renderCompetition() {
     Math.max(
       10,
       ...ranked.map(
-        function (item) {
-          return item.score;
-        }
+        item => item.score
       )
     );
 
@@ -1094,7 +881,7 @@ function renderCompetition() {
 
 
   box.innerHTML =
-    ranked.map(function (item, index) {
+    ranked.map((item, index) => {
 
       const rank =
         index + 1;
@@ -1120,7 +907,6 @@ function renderCompetition() {
 
 
       let medal;
-
 
       if (rank === 1) {
         medal = "🥇";
@@ -1183,7 +969,7 @@ function renderCompetition() {
 
             <button
               class="score-btn minus"
-              onclick="adjustScore(${JSON.stringify(item.name)}, -10)"
+              onclick='adjustScore(${JSON.stringify(item.name)}, -10)'
             >
               −10
             </button>
@@ -1191,7 +977,7 @@ function renderCompetition() {
 
             <button
               class="score-btn minus"
-              onclick="adjustScore(${JSON.stringify(item.name)}, -5)"
+              onclick='adjustScore(${JSON.stringify(item.name)}, -5)'
             >
               −5
             </button>
@@ -1199,7 +985,7 @@ function renderCompetition() {
 
             <button
               class="score-btn plus"
-              onclick="adjustScore(${JSON.stringify(item.name)}, 5)"
+              onclick='adjustScore(${JSON.stringify(item.name)}, 5)'
             >
               +5
             </button>
@@ -1207,7 +993,7 @@ function renderCompetition() {
 
             <button
               class="score-btn plus"
-              onclick="adjustScore(${JSON.stringify(item.name)}, 10)"
+              onclick='adjustScore(${JSON.stringify(item.name)}, 10)'
             >
               +10
             </button>
@@ -1223,7 +1009,7 @@ function renderCompetition() {
 
 
 /* =========================
-   KHỞI ĐỘNG
+   CHẠY WEBSITE
 ========================= */
 
 render();
