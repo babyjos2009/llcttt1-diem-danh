@@ -967,36 +967,33 @@ function renderCompetition() {
 
           <div class="score-actions">
 
-            <button
-              class="score-btn minus"
-              onclick='adjustScore(${JSON.stringify(item.name)}, -10)'
-            >
-              −10
-            </button>
+           <button
+  class="score-btn minus"
+  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, -10)"
+>
+  −10
+</button>
 
+<button
+  class="score-btn minus"
+  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, -5)"
+>
+  −5
+</button>
 
-            <button
-              class="score-btn minus"
-              onclick='adjustScore(${JSON.stringify(item.name)}, -5)'
-            >
-              −5
-            </button>
+<button
+  class="score-btn plus"
+  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, 5)"
+>
+  +5
+</button>
 
-
-            <button
-              class="score-btn plus"
-              onclick='adjustScore(${JSON.stringify(item.name)}, 5)'
-            >
-              +5
-            </button>
-
-
-            <button
-              class="score-btn plus"
-              onclick='adjustScore(${JSON.stringify(item.name)}, 10)'
-            >
-              +10
-            </button>
+<button
+  class="score-btn plus"
+  onclick="adjustScoreByIndex(${data.members.indexOf(item.name)}, 10)"
+>
+  +10
+</button>
 
           </div>
 
