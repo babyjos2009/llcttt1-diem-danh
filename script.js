@@ -1,8 +1,10 @@
 const defaultNames=["Nguyễn Văn An","Trần Văn Bình","Lê Minh Châu","Phạm Đức Duy","Hoàng Gia Huy","Nguyễn Thị Lan","Vũ Minh Long","Đỗ Quang Nam","Trần Thông"];
 const key="llcttt1_attendance_v3";
 let data=JSON.parse(localStorage.getItem(key)||"null");
-if(!data){
- data={members:defaultNames,sessions:[{date:new Date().toISOString(),label:"Buổi học 1",attendance:Array(defaultNames.length).fill(false)}],current:0};
+let data=JSON.parse(localStorage.getItem(key)||"null");
+if(!data || !Array.isArray(data.members) || data.members.length===0){
+ data={members:[...defaultNames],sessions:[{date:new Date().toISOString(),label:"Buổi học 1",attendance:Array(defaultNames.length).fill(false)}],current:0};
+ localStorage.setItem(key,JSON.stringify(data));
 }
 function save(){localStorage.setItem(key,JSON.stringify(data))}
 function render(){
